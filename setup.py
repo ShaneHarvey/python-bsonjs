@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
+import glob
 import sys
 
 try:
@@ -34,36 +34,6 @@ if sys.version_info[:2] == (2, 6):
     test_suite = "unittest2.collector"
 else:
     test_suite = "test"
-
-
-def pkgconfig(lib, flag):
-    command = ["pkg-config", lib, flag]
-    if sys.platform == "win32":
-        command.append("--msvc-syntax")
-
-    try:
-        proc = subprocess.Popen(command,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT,
-                                universal_newlines=True)
-    except OSError as exc:
-        exit("pkg-config failed: {0}\n"
-             "Is pkg-config installed?".format(exc.strerror))
-
-    out, _ = proc.communicate()
-    if proc.returncode != 0:
-        exit("Failed to determine compile flags for libbson: {0}".format(out))
-
-    return out.strip().split()
-
-
-def compile_args(lib):
-    return pkgconfig(lib, "--cflags")
-
-
-def link_args(lib):
-    return pkgconfig(lib, "--libs")
-
 
 setup(
     name="python-bsonjs",
@@ -92,9 +62,15 @@ setup(
     ext_modules=[
         Extension(
             "bsonjs",
-            extra_compile_args=compile_args("libbson-1.0"),
-            extra_link_args=link_args("libbson-1.0"),
-            sources=["src/bsonjs.c"]
+            sources=["src/bsonjs.c"] +
+                    glob.glob("libbson/src/yajl/*.c") +
+                    glob.glob("libbson/src/bson/*.c"),
+            include_dirs=["src",
+                          "src/bson",
+                          "libbson/src",
+                          "libbson/src/yajl",
+                          "libbson/src/bson"],
+            define_macros=[("BSON_COMPILATION", 1)]
         )
     ]
 )
