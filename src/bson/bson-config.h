@@ -20,7 +20,7 @@
 /*
  * Define to 1 if you have stdbool.h
  */
-#define BSON_HAVE_STDBOOL_H 1
+#define BSON_HAVE_STDBOOL_H 0
 #if BSON_HAVE_STDBOOL_H != 1
 # undef BSON_HAVE_STDBOOL_H
 #endif
