@@ -70,7 +70,8 @@ setup(
                           "libbson/src",
                           "libbson/src/yajl",
                           "libbson/src/bson"],
-            define_macros=[("BSON_COMPILATION", 1)]
+            define_macros=[("BSON_COMPILATION", 1)],
+            libraries=["ws2_32"] if sys.platform == "win32" else []
         )
     ]
 )
