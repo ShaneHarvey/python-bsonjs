@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import glob
+import os
+import subprocess
 import sys
 
 try:
@@ -34,6 +35,44 @@ if sys.version_info[:2] == (2, 6):
     test_suite = "unittest2.collector"
 else:
     test_suite = "test"
+
+
+def run_or_exit(args):
+    try:
+        subprocess.check_output(args, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as err:
+        exit(err.output)
+
+
+def install_libbson():
+    install_dir = os.path.join(os.getcwd(), "libbson", "install_dir")
+    if os.path.isdir(install_dir):
+        return
+    try:
+        os.chdir("libbson")
+        if sys.platform == "win32":
+            # Windows
+            arch = "Win64" if sys.maxsize == (1 << 63) - 1 else "Win32"
+            run_or_exit(["cmake", "-G", '"Visual Studio 10 2010 ' + arch + '"',
+                         '"-DCMAKE_INSTALL_PREFIX=' + install_dir + '"'])
+            run_or_exit(["msbuild.exe", "ALL_BUILD.vcxproj"])
+            run_or_exit(["msbuild.exe", "INSTALL.vcxproj"])
+        else:
+            # Unix like
+            run_or_exit(["./autogen.sh", "--enable-static",
+                         "--prefix=" + install_dir])
+            run_or_exit(["make"])
+            run_or_exit(["make", "install"])
+        print("Installed libbson in: " + install_dir)
+    finally:
+        os.chdir("..")
+
+install_libbson()
+
+if sys.platform == "win32":
+    LIBBSON_STATIC = "libbson/install_dir/lib/bson-static-1.0.lib"
+else:
+    LIBBSON_STATIC = "libbson/install_dir/lib/libbson-1.0.a"
 
 setup(
     name="python-bsonjs",
@@ -62,16 +101,10 @@ setup(
     ext_modules=[
         Extension(
             "bsonjs",
-            sources=["src/bsonjs.c"] +
-                    glob.glob("libbson/src/yajl/*.c") +
-                    glob.glob("libbson/src/bson/*.c"),
+            sources=["src/bsonjs.c"],
             include_dirs=["src",
-                          "src/bson",
-                          "libbson/src",
-                          "libbson/src/yajl",
-                          "libbson/src/bson"],
-            define_macros=[("BSON_COMPILATION", 1)],
-            libraries=["ws2_32"] if sys.platform == "win32" else []
+                          "libbson/install_dir/include/libbson-1.0"],
+            extra_objects=[LIBBSON_STATIC]
         )
     ]
 )
