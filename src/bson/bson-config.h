@@ -11,7 +11,7 @@
 /*
  * Define to 1234 for Little Endian, 4321 for Big Endian.
  */
-#if WORDS_BIGENDIAN == 1
+#ifdef WORDS_BIGENDIAN
 # define BSON_BYTE_ORDER 4321
 #else
 # define BSON_BYTE_ORDER 1234
@@ -122,7 +122,10 @@
 /*
  * Define to 1 if you have struct timespec available on your platform.
  */
-#define BSON_HAVE_TIMESPEC 1
+#ifdef HAVE_CLOCK_GETTIME
+# define BSON_HAVE_TIMESPEC 1
+#endif
+
 #if BSON_HAVE_TIMESPEC != 1
 # undef BSON_HAVE_TIMESPEC
 #endif
@@ -131,7 +134,7 @@
 /*
  * Define to 1 if you want extra aligned types in libbson
  */
-#define BSON_EXTRA_ALIGN 1
+#define BSON_EXTRA_ALIGN 0
 #if BSON_EXTRA_ALIGN != 1
 # undef BSON_EXTRA_ALIGN
 #endif
