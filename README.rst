@@ -31,7 +31,7 @@ Installing From Source
 
 Download the source and install::
 
-    $ git clone git@github.com:mongodb-labs/python-bsonjs.git
+    $ git clone --recursive git@github.com:mongodb-labs/python-bsonjs.git
     $ cd python-bsonjs
     $ python setup.py install
 
