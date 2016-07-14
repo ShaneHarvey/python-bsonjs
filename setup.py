@@ -15,6 +15,12 @@
 import glob
 import sys
 
+# work-around for python2.6 https://bugs.python.org/issue15881
+try:
+    import multiprocessing
+except ImportError:
+    pass
+
 try:
     from setuptools import setup, Extension
 except ImportError:
