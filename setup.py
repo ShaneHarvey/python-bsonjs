@@ -15,7 +15,7 @@
 import glob
 import sys
 
-# work-around for python2.6 https://bugs.python.org/issue15881
+# work-around for https://bugs.python.org/issue15881
 try:
     import multiprocessing
 except ImportError:
@@ -68,9 +68,7 @@ setup(
     ext_modules=[
         Extension(
             "bsonjs",
-            sources=["src/bsonjs.c"] +
-                    glob.glob("libbson/src/yajl/*.c") +
-                    glob.glob("libbson/src/bson/*.c"),
+            sources=["src/bsonjs.c"] + glob.glob("libbson/src/*/*.c"),
             include_dirs=["src",
                           "src/bson",
                           "libbson/src",

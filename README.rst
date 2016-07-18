@@ -29,10 +29,20 @@ built with.
 Installing From Source
 ======================
 
-Download the source and install::
+Note that this repository contains a `git submodule
+<https://git-scm.com/book/en/v2/Git-Tools-Submodules>`_. You must initialize
+the submodule by using::
 
-    $ git clone git@github.com:mongodb-labs/python-bsonjs.git
+    $ git clone --recursive https://github.com/mongodb-labs/python-bsonjs.git
+
+Or, if your version of git does not have ``clone --recursive``::
+
+    $ git clone https://github.com/mongodb-labs/python-bsonjs.git
     $ cd python-bsonjs
+    $ git submodule update --init --recursive
+
+Once you have the source properly downloaded, install the package::
+
     $ python setup.py install
 
 Tests
