@@ -14,6 +14,7 @@
 
 import glob
 import sys
+from distutils import sysconfig
 
 # work-around for https://bugs.python.org/issue15881
 try:
@@ -65,16 +66,20 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython"],
+    libraries=[("libbson", {
+        "sources": glob.glob("libbson/src/*/*.c"),
+        "include_dirs": ["src/bson",
+                         "libbson/src",
+                         "libbson/src/yajl",
+                         "libbson/src/bson",
+                         sysconfig.get_python_inc(),
+                         sysconfig.get_python_inc(plat_specific=1)],
+        "macros": [("BSON_COMPILATION", 1)]})],
     ext_modules=[
         Extension(
             "bsonjs",
-            sources=["src/bsonjs.c"] + glob.glob("libbson/src/*/*.c"),
-            include_dirs=["src",
-                          "src/bson",
-                          "libbson/src",
-                          "libbson/src/yajl",
-                          "libbson/src/bson"],
-            define_macros=[("BSON_COMPILATION", 1)],
+            sources=["src/bsonjs.c"],
+            include_dirs=["src", "src/bson", "libbson/src/bson"],
             libraries=["ws2_32"] if sys.platform == "win32" else []
         )
     ]
