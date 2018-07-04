@@ -79,12 +79,12 @@ setup(
     ext_modules=[
         Extension(
             "bsonjs",
-            sources=["src/bsonjs.c"] + glob.glob("libbson/src/*/*.c"),
+            sources=["src/bsonjs.c"] + glob.glob("vendor/mongo-c-driver/src/libbson/src/*/*.c"),
             include_dirs=["src",
                           "src/bson",
-                          "libbson/src",
-                          "libbson/src/jsonsl",
-                          "libbson/src/bson"],
+                          "vendor/mongo-c-driver/src/libbson/src",
+                          "vendor/mongo-c-driver/src/libbson/src/jsonsl",
+                          "vendor/mongo-c-driver/src/libbson/src/bson"],
             define_macros=[("BSON_COMPILATION", 1)],
             libraries=libraries
         )
