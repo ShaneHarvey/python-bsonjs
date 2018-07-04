@@ -95,22 +95,14 @@ built with.
 Source
 ``````
 
-Note that this repository contains a `git submodule
-<https://git-scm.com/book/en/v2/Git-Tools-Submodules>`_. You must initialize
-the submodule by using::
-
-    $ git clone --recursive https://github.com/mongodb-labs/python-bsonjs.git
-
-Or, if your version of git does not have ``clone --recursive``::
+To clone this repository::
 
     $ git clone https://github.com/mongodb-labs/python-bsonjs.git
-    $ cd python-bsonjs
-    $ git submodule update --init --recursive
 
 Install
 ```````
 
-Once you have the source properly downloaded, build and install the package::
+To build and install the package::
 
     $ python setup.py install
 
