@@ -15,12 +15,8 @@
  */
 
 
-#include <assert.h>
 #include <bson.h>
-#include <fcntl.h>
-#include <time.h>
 
-#include "bson-tests.h"
 #include "TestSuite.h"
 
 
@@ -32,26 +28,26 @@ test_bson_string_new (void)
 
    str = bson_string_new (NULL);
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, ""));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, ""));
    bson_free (s);
 
    str = bson_string_new ("");
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!*s);
-   assert (0 == strcmp (s, ""));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!*s);
+   BSON_ASSERT (0 == strcmp (s, ""));
    bson_free (s);
 
    str = bson_string_new ("abcdef");
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, "abcdef"));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, "abcdef"));
    bson_free (s);
 
    str = bson_string_new ("");
    s = bson_string_free (str, true);
-   assert (!s);
+   BSON_ASSERT (!s);
 }
 
 
@@ -65,16 +61,16 @@ test_bson_string_append (void)
    bson_string_append (str, "christian was here");
    bson_string_append (str, "\n");
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, "christian was here\n"));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, "christian was here\n"));
    bson_free (s);
 
    str = bson_string_new (">>>");
    bson_string_append (str, "^^^");
    bson_string_append (str, "<<<");
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, ">>>^^^<<<"));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, ">>>^^^<<<"));
    bson_free (s);
 }
 
@@ -92,8 +88,8 @@ test_bson_string_append_c (void)
    bson_string_append_c (str, 'i');
    bson_string_append_c (str, 's');
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, "chris"));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, "chris"));
    bson_free (s);
 }
 
@@ -122,8 +118,8 @@ test_bson_string_append_unichar (void)
    str = bson_string_new (NULL);
    bson_string_append_unichar (str, 0x20AC);
    s = bson_string_free (str, false);
-   assert (s);
-   assert (!strcmp (s, (const char *) test1));
+   BSON_ASSERT (s);
+   BSON_ASSERT (!strcmp (s, (const char *) test1));
    bson_free (s);
 }
 
@@ -134,7 +130,7 @@ test_bson_strdup_printf (void)
    char *s;
 
    s = bson_strdup_printf ("%s:%u", "localhost", 27017);
-   assert (!strcmp (s, "localhost:27017"));
+   BSON_ASSERT (!strcmp (s, "localhost:27017"));
    bson_free (s);
 }
 
@@ -145,7 +141,7 @@ test_bson_strdup (void)
    char *s;
 
    s = bson_strdup ("localhost:27017");
-   assert (!strcmp (s, "localhost:27017"));
+   BSON_ASSERT (!strcmp (s, "localhost:27017"));
    bson_free (s);
 }
 
@@ -156,24 +152,24 @@ test_bson_strndup (void)
    char *s;
 
    s = bson_strndup ("asdf", 2);
-   assert (!strcmp (s, "as"));
+   BSON_ASSERT (!strcmp (s, "as"));
    bson_free (s);
 
    s = bson_strndup ("asdf", 10);
-   assert (!strcmp (s, "asdf"));
+   BSON_ASSERT (!strcmp (s, "asdf"));
    bson_free (s);
 
    /* Some tests where we truncate to size n-1, n, n+1 */
    s = bson_strndup ("asdf", 3);
-   assert (!strcmp (s, "asd"));
+   BSON_ASSERT (!strcmp (s, "asd"));
    bson_free (s);
 
    s = bson_strndup ("asdf", 4);
-   assert (!strcmp (s, "asdf"));
+   BSON_ASSERT (!strcmp (s, "asdf"));
    bson_free (s);
 
    s = bson_strndup ("asdf", 5);
-   assert (!strcmp (s, "asdf"));
+   BSON_ASSERT (!strcmp (s, "asdf"));
    bson_free (s);
 }
 
@@ -266,9 +262,9 @@ test_bson_ascii_strtoll (void)
       errno = 0;
 
       rv = bson_ascii_strtoll (tests[i].str, &endptr, tests[i].base);
-      assert_cmpint (rv, ==, tests[i].rv);
-      assert_cmpint (errno, ==, tests[i]._errno);
-      assert_cmpstr (endptr, tests[i].remaining);
+      ASSERT_CMPINT64 (rv, ==, tests[i].rv);
+      ASSERT_CMPINT (errno, ==, tests[i]._errno);
+      ASSERT_CMPSTR (endptr, tests[i].remaining);
    }
 #undef END
 }
@@ -280,9 +276,32 @@ test_bson_strncpy (void)
    char buf[5];
 
    bson_strncpy (buf, "foo", sizeof buf);
-   assert_cmpstr ("foo", buf);
+   ASSERT_CMPSTR ("foo", buf);
    bson_strncpy (buf, "foobar", sizeof buf);
-   assert_cmpstr ("foob", buf);
+   ASSERT_CMPSTR ("foob", buf);
+   /* CDRIVER-2596 make sure strncpy with size 0 doesn't write to buf[-1] */
+   bson_strncpy (buf + 1, "z", 0);
+   ASSERT_CMPSTR ("foob", buf);
+}
+
+
+static void
+test_bson_snprintf (void)
+{
+   char buf[] = "ab";
+
+   /* CDRIVER-2595 make sure snprintf with size 0 doesn't write to buf[-1] */
+   ASSERT_CMPINT (bson_snprintf (buf + 1, 0, "%d", 1), ==, 0);
+   ASSERT_CMPSTR (buf, "ab");
+}
+
+
+static void
+test_bson_strcasecmp (void)
+{
+   BSON_ASSERT (!bson_strcasecmp ("FoO", "foo"));
+   BSON_ASSERT (bson_strcasecmp ("Foa", "foo") < 0);
+   BSON_ASSERT (bson_strcasecmp ("FoZ", "foo") > 0);
 }
 
 
@@ -301,5 +320,7 @@ test_string_install (TestSuite *suite)
    TestSuite_Add (suite, "/bson/string/strndup", test_bson_strndup);
    TestSuite_Add (suite, "/bson/string/ascii_strtoll", test_bson_ascii_strtoll);
    TestSuite_Add (suite, "/bson/string/strncpy", test_bson_strncpy);
+   TestSuite_Add (suite, "/bson/string/snprintf", test_bson_snprintf);
    TestSuite_Add (suite, "/bson/string/strnlen", test_bson_strnlen);
+   TestSuite_Add (suite, "/bson/string/strcasecmp", test_bson_strcasecmp);
 }

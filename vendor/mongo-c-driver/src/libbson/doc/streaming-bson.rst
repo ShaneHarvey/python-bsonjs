@@ -8,7 +8,7 @@ Streaming BSON
 Reading from a BSON Stream
 --------------------------
 
-:symbol:`bson_reader_t` provides a convenient API to read sequential BSON documents from a file-descriptor or memory buffer. The :symbol:`bson_reader_read()` function will read forward in the underlying stream and returna :symbol:`bson_t` that can be inspected and iterated upon.
+:symbol:`bson_reader_t` provides a convenient API to read sequential BSON documents from a file-descriptor or memory buffer. The :symbol:`bson_reader_read()` function will read forward in the underlying stream and return a :symbol:`bson_t` that can be inspected and iterated upon.
 
 .. code-block:: c
 
@@ -31,7 +31,7 @@ Reading from a BSON Stream
      }
 
      while ((doc = bson_reader_read (reader, &eof))) {
-        char *str = bson_as_json (doc, NULL);
+        char *str = bson_as_canonical_extended_json (doc, NULL);
         printf ("%s\n", str);
         bson_free (str);
      }

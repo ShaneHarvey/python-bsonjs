@@ -79,9 +79,12 @@ setup(
     ext_modules=[
         Extension(
             "bsonjs",
-            sources=["src/bsonjs.c"] + glob.glob("vendor/mongo-c-driver/src/libbson/src/*/*.c"),
+            sources=(["src/bsonjs.c"] +
+                     glob.glob("vendor/mongo-c-driver/src/libbson/src/*/*.c") +
+                     glob.glob("vendor/mongo-c-driver/src/common/*.c")),
             include_dirs=["src",
                           "src/bson",
+                          "vendor/mongo-c-driver/src/common",
                           "vendor/mongo-c-driver/src/libbson/src",
                           "vendor/mongo-c-driver/src/libbson/src/jsonsl",
                           "vendor/mongo-c-driver/src/libbson/src/bson"],

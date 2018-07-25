@@ -8,6 +8,9 @@ Synopsis
 
 .. code-block:: c
 
+  #define BSON_APPEND_ARRAY(b, key, val) \
+     bson_append_array (b, key, (int) strlen (key), val)
+
   bool
   bson_append_array (bson_t *bson,
                      const char *key,
@@ -25,10 +28,9 @@ Parameters
 Description
 -----------
 
-The :symbol:`bson_append_array()` function shall append ``child`` to ``bson`` using the specified key. The type of the field will be an array, but it is the responsibility of the caller to ensure that the keys of ``child`` are properly formatted with string keys such as "0", "1", "2" and so forth.
+The :symbol:`bson_append_array()` function shall append ``array`` to ``bson`` using the specified key. The type of the field will be an array, but it is the responsibility of the caller to ensure that the keys of ``array`` are properly formatted with string keys such as "0", "1", "2" and so forth.
 
 Returns
 -------
 
-true if the operation was applied successfully, otherwise false and ``bson`` should be discarded.
-
+Returns ``true`` if the operation was applied successfully. The function fails if appending the array grows ``bson`` larger than INT32_MAX.
